@@ -1,0 +1,37 @@
+account-check-ui:not([hidden]) {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--in-content-box-info-background);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+account-check-ui >:first-child {
+  flex: 1;
+  margin: 4px;
+}
+
+account-check-ui >:first-child >div {
+  display: flex;
+  align-items: center;
+}
+
+account-check-ui img {
+  content: url("chrome://global/skin/icons/info.svg");
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  margin-inline-end: 4px;
+  -moz-context-properties: fill;
+  fill: currentColor; 
+}
+
+account-check-ui ul {
+  list-style: none;
+  margin: 4px 0 0;
+  padding-inline-start: 2em;
+}
+
+account-check-ui > :last-child {
+  align-content: end;
+}

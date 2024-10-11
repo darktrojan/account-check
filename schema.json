@@ -1,0 +1,13 @@
+[
+  {
+    "namespace": "account_check",
+    "functions": [
+      {
+        "name": "init",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      }
+    ]
+  }
+]

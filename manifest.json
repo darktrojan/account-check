@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+  "name": "Account Check",
+  "version": "1",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "account-check@extensions.thunderbird.net",
+      "strict_min_version": "128.0",
+      "strict_max_version": "133.*"
+    }
+  },
+  "author": "Geoff Lankow",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "experiment_apis": {
+    "account_check": {
+      "schema": "schema.json",
+      "parent": {
+        "scopes": [
+          "addon_parent"
+        ],
+        "paths": [
+          [
+            "account_check"
+          ]
+        ],
+        "script": "implementation.js"
+      }
+    }
+  }
+}
