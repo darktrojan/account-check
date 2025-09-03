@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
   "name": "Account Check",
-  "version": "1",
+  "version": "2",
   "browser_specific_settings": {
     "gecko": {
       "id": "account-check@extensions.thunderbird.net",
       "strict_min_version": "128.0",
-      "strict_max_version": "133.*"
+      "strict_max_version": "144.*"
     }
   },
   "author": "Geoff Lankow",

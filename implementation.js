@@ -1,23 +1,12 @@
 /* eslint-env es2023 */
-/* globals Cc ChromeUtils Ci console Services */
+/* globals Cc ChromeUtils Ci Services */
 /* eslint no-undef: ["error"] */
 
 const { ExtensionCommon } = ChromeUtils.importESModule(
   "resource://gre/modules/ExtensionCommon.sys.mjs"
 );
-const { FetchConfig } = ChromeUtils.importESModule(
-  "resource:///modules/accountcreation/FetchConfig.sys.mjs"
-);
-const { MailServices } = ChromeUtils.importESModule(
-  "resource:///modules/MailServices.sys.mjs"
-);
-const { OAuth2Providers } = ChromeUtils.importESModule(
-  "resource:///modules/OAuth2Providers.sys.mjs"
-);
 
-const resProto = Cc["@mozilla.org/network/protocol;1?name=resource"].getService(
-  Ci.nsISubstitutingProtocolHandler
-);
+let baseURL, basePath;
 
 function observe(doc) {
   if (doc.documentURI == "chrome://messenger/content/am-server.xhtml") {
@@ -42,20 +31,10 @@ function observe(doc) {
   }
 }
 
-function updateUI(win) {
+async function updateUI(win) {
   const doc = win.document;
   let addonUI = doc.querySelector("account-check-ui");
   if (!addonUI) {
-    const script = doc.createElement("script");
-    script.type = "module";
-    script.src = "resource://account-check/account-check-ui.mjs";
-    doc.head.appendChild(script);
-
-    const link = doc.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "resource://account-check/account-check-ui.css";
-    doc.head.appendChild(link);
-
     const containerBox = doc.getElementById("containerBox");
     const securityDiv = containerBox.querySelector(
       "#containerBox > div:has(#server\\.socketType)"
@@ -64,6 +43,18 @@ function updateUI(win) {
       doc.createElement("account-check-ui"),
       securityDiv?.nextElementSibling
     );
+
+    const script = doc.createElement("script");
+    script.textContent = await IOUtils.readUTF8(
+      PathUtils.join(basePath, "account-check-ui.mjs")
+    );
+    doc.head.appendChild(script);
+
+    const style = doc.createElement("style");
+    style.textContent = await IOUtils.readUTF8(
+      PathUtils.join(basePath, "account-check-ui.css")
+    );
+    doc.head.appendChild(style);
   }
   if (addonUI.beginCheck) {
     addonUI.beginCheck();
@@ -73,7 +64,8 @@ function updateUI(win) {
 var account_check = class extends ExtensionCommon.ExtensionAPI {
   getAPI(context) {
     context.callOnClose(this);
-    resProto.setSubstitution("account-check", this.extension.rootURI);
+    baseURL = this.extension.baseURL;
+    basePath = this.extension.rootURI.filePath;
 
     return {
       account_check: {
@@ -85,6 +77,5 @@ var account_check = class extends ExtensionCommon.ExtensionAPI {
   }
   close() {
     Services.obs.removeObserver(observe, "chrome-document-loaded");
-    resProto.setSubstitution("account-check", null);
   }
 };

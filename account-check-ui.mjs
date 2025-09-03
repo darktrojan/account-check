@@ -2,6 +2,8 @@
 /* globals ChromeUtils Ci Services */
 /* eslint no-undef: ["error"] */
 
+{
+
 const { FetchConfig } = ChromeUtils.importESModule(
   "resource:///modules/accountcreation/FetchConfig.sys.mjs"
 );
@@ -13,6 +15,7 @@ const { OAuth2Providers } = ChromeUtils.importESModule(
 );
 
 class AccountCheckUI extends HTMLElement {
+  #checking = false;
   #status;
   #list;
   #button;
@@ -56,6 +59,11 @@ class AccountCheckUI extends HTMLElement {
   }
 
   async beginCheck() {
+    if (this.#checking) {
+      return;
+    }
+    this.#checking = true;
+
     const server = this.getServer();
     if (!["imap", "pop3", "smtp"].includes(server.type)) {
       this.hidden = true;
@@ -264,9 +272,12 @@ class AccountCheckUI extends HTMLElement {
             `mail.smtpserver.${this.#server.key}.oauth2.issuer`,
             ""
           )
-        : this.#server.getCharValue("oauth2.issuer");
+        : this.#server.getStringValue("oauth2.issuer");
     if (!oAuthHostName) {
-      const oAuthDetails = OAuth2Providers.getHostnameDetails(hostname);
+      const oAuthDetails = OAuth2Providers.getHostnameDetails(
+        hostname,
+        this.#server.type
+      );
       oAuthHostName = oAuthDetails?.[0];
     }
     if (oAuthHostName) {
@@ -374,3 +385,5 @@ class AccountCheckUI extends HTMLElement {
   }
 }
 window.customElements.define("account-check-ui", AccountCheckUI);
+
+}
